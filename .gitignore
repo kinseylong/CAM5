@@ -1,0 +1,15 @@
+*.fasta
+*.csv
+*.tsv
+*.json
+*.vcf
+*.bam
+*.sam
+*.bed
+*.gff
+*.gtf
+*.vcf.gz
+*.bam.bai
+*.samtools
+*.fastq
+*.fastq.gz
