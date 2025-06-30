@@ -1,4 +1,4 @@
-name: /Users/kinseylong/Desktop/MoiLab/.conda
+name: moilab
 channels:
   - defaults
   - conda-forge
