@@ -1,4 +1,4 @@
-name: /moilab
+name: moilab
 channels:
   - defaults
   - conda-forge
