@@ -1,4 +1,4 @@
-name: moilab
+name: /Users/kinseylong/Desktop/MoiLab/.conda
 channels:
   - defaults
   - conda-forge
@@ -86,3 +86,4 @@ dependencies:
       - tqdm==4.67.1
       - tzdata==2025.2
       - urllib3==2.5.0
+prefix: /Users/kinseylong/Desktop/MoiLab/.conda
