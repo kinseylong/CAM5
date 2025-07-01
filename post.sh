@@ -10,7 +10,7 @@
 
 #SBATCH --cores=4
 
-#SBATCH --time=24:00:00 --mem 9gb
+#SBATCH --time=20:00:00 --mem 9gb
 
 source /global/scratch/projects/fc_moilab/kinseylong/CAM5/CAM5/bin/activate
 python /global/scratch/projects/fc_moilab/kinseylong/CAM5/ArabidopsisIDRpuller.py
