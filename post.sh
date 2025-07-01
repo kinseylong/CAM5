@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #SBATCH --job-name=alphafold_IDR_puller
-#SBATCH --account=fc_moilab
+#SBATCH --account=co_moilab
 #SBATCH --partition=savio3_htc
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
