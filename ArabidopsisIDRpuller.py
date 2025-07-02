@@ -2,10 +2,12 @@ import os
 import csv
 import requests
 import pandas as pd
+import math
+import metapredict
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 path_to_uniprot_tsv = "data/TAIR10/ArabidopsisUniprot.tsv"
-output_idr_file_path_csv = "data/TAIR10/IDRs.csv"
+output_idr_file_path_csv = "data/TAIR10/IDRs_metapredict.csv"
 
 def DL_range(enumerated_values, min_length):
     ranges = []
@@ -58,7 +60,11 @@ def process_entry(row):
     results = []
     if IDR_starts:
         for start, end, seq, score in zip(IDR_starts, IDR_ends, IDR_seq, IDR_scores):
-            results.append((entry, start, end, seq, score))
+            try:
+                disorder = metapredict.percent_disorder(seq)
+            except Exception as e:
+                disorder = math.nan
+            results.append((entry, start, end, seq, score, disorder))
     return results
 
 # Load and filter uniprot
@@ -77,7 +83,7 @@ if os.path.exists(output_idr_file_path_csv) and os.path.getsize(output_idr_file_
     print(f"Filtered uniprot DataFrame to exclude {len(written_entries)} already written entries.")
 else:
     with open(output_idr_file_path_csv, "w") as w:
-        w.write("Entry\tStart\tEnd\tSequence\tConfidenceScore\n")
+        w.write("Entry\tStart\tEnd\tSequence\tConfidenceScore\tMetapredictDisorderPercent\n")
 
 # Parallel processing
 rows = uniprot.to_dict(orient="records")
@@ -87,5 +93,5 @@ with ProcessPoolExecutor(max_workers=num_workers) as executor, open(output_idr_f
     futures = [executor.submit(process_entry, row) for row in rows]
     for future in as_completed(futures):
         results = future.result()
-        for entry, start, end, seq, score in results:
-            f.write(f"{entry}\t{start}\t{end}\t{seq}\t{score}\n")
+        for entry, start, end, seq, score, metapredict_score in results:
+            f.write(f"{entry}\t{start}\t{end}\t{seq}\t{score}\t{metapredict_score}\n")

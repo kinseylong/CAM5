@@ -13,3 +13,5 @@
 *.samtools
 *.fastq
 *.fastq.gz
+
+*.conda/
