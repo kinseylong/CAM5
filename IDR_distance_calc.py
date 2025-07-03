@@ -164,3 +164,5 @@ with ProcessPoolExecutor(max_workers=num_workers) as executor, open(output_filep
         results = future.result()
         for entry, sequence, four_dist, eight_dist, twelve_dist, eighteen_dist in results:
             f.write(f"{entry}\t{sequence}\t{four_dist}\t{eight_dist}\t{twelve_dist}\t{eighteen_dist}\n")
+
+print(f"Processed {len(rows)} entries and saved results to {output_filepath_csv}.")
