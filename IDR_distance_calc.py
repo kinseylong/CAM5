@@ -6,7 +6,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 target_sequence = "MAAKRSSNSAEYKEKNGRRKSHCRIL"
                             
-path_to_tsv = "data/TAIR10/IDRs.tsv"
+path_to_tsv = "data/TAIR10/IDRs.csv"
 output_filepath_csv = "data/TAIR10/ArabidopsisReducedAlphabet.csv"
 
 ##reduced alphabets
