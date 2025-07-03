@@ -2,12 +2,13 @@ import os
 import csv
 import pandas as pd
 import Levenshtein
+import textdistance
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 target_sequence = "MAAKRSSNSAEYKEKNGRRKSHCRIL"
                             
 path_to_tsv = "data/TAIR10/IDRs.csv"
-output_filepath_csv = "data/TAIR10/ArabidopsisReducedAlphabet.csv"
+output_filepath_csv = "data/TAIR10/ArabidopsisReducedAlphabet_cosine.csv"
 
 # Reduced alphabets
 four = {"L": "A", "V": "A", "I": "A", "M": "A", "C": "A",
@@ -111,16 +112,33 @@ def sliding_window_levenshtein(str1, str2, window_size=None, step=2):
         distances.append((dist, window))
     return sorted(distances)[0][0]  # Return only the minimum distance
 
+def sliding_window_cosine(str1, str2, window_size=None, step=2):
+    if window_size is None:
+        window_size = min(len(str1), len(str2))
+    if len(str1) <= len(str2):
+        target = str2
+        query = str1
+    else:
+        target = str1
+        query = str2
+    distances = []
+    for i in range(0, len(target) - window_size + 1, step):
+        window = target[i:i + window_size]
+        dist = textdistance.cosine(query, window)
+        distances.append((dist, window))
+    return sorted(distances)[0][0]  # Return only the minimum distance
+
+
 def process_entry(row):
     entry = row['Entry']
     sequence = row['Sequence']
     # Reduce alphabet
     four_seq, eight_seq, ten_seq, twelve_seq, fifteen_seq, eighteen_seq = reduce_alphabet(sequence)
     # Calculate Levenshtein distance against each alphabet
-    four_dist = sliding_window_levenshtein(four_seq, target_seq_four)
-    eight_dist = sliding_window_levenshtein(eight_seq, target_seq_eight)
-    twelve_dist = sliding_window_levenshtein(twelve_seq, target_seq_twelve)
-    eighteen_dist = sliding_window_levenshtein(eighteen_seq, target_seq_eighteen)
+    four_dist = sliding_window_cosine(four_seq, target_seq_four)
+    eight_dist = sliding_window_cosine(eight_seq, target_seq_eight)
+    twelve_dist = sliding_window_cosine(twelve_seq, target_seq_twelve)
+    eighteen_dist = sliding_window_cosine(eighteen_seq, target_seq_eighteen)
     return (entry, sequence, four_dist, eight_dist, twelve_dist, eighteen_dist)
 
 # Load and filter uniprot

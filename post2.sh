@@ -4,8 +4,8 @@
 #SBATCH --account=fc_moilab
 #SBATCH --partition=savio4_htc
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=10
-#SBATCH --time=10:00:00
+#SBATCH --cpus-per-task=5
+#SBATCH --time=0:30:00
 #SBATCH --mem=9gb
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=kinsey.long@berkeley.edu
