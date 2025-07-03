@@ -95,3 +95,5 @@ with ProcessPoolExecutor(max_workers=num_workers) as executor, open(output_idr_f
         results = future.result()
         for entry, start, end, seq, score, metapredict_score in results:
             f.write(f"{entry}\t{start}\t{end}\t{seq}\t{score}\t{metapredict_score}\n")
+
+print(f"Processed {len(rows)} entries and saved results to {output_idr_file_path_csv}.")
