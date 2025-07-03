@@ -9,7 +9,7 @@ target_sequence = "MAAKRSSNSAEYKEKNGRRKSHCRIL"
 path_to_tsv = "data/TAIR10/IDRs.csv"
 output_filepath_csv = "data/TAIR10/ArabidopsisReducedAlphabet.csv"
 
-##reduced alphabets
+# Reduced alphabets
 four = {"L": "A", "V": "A", "I": "A", "M": "A", "C": "A",
         "A": "B", "G": "B", "S": "B", "T": "B", "P": "B",
         "F": "C", "Y": "C", "W": "C",
@@ -82,64 +82,53 @@ eighteen = {"L": "A", "M": "A",
             "K": "P", 
             "R": "Q",
             "H": "R"}
-
-#convert sequence into reduced alphabet sequences
+# Convert sequence into reduced alphabet sequences
 def reduce_alphabet(sequence):
     def translate(sequence, reduction_dict):
         return ''.join([reduction_dict.get(res, res) for res in sequence])
-    
     reduced_seq_four = translate(sequence, four)
     reduced_seq_eight = translate(sequence, eight)
     reduced_seq_ten = translate(sequence, ten)
     reduced_seq_twelve = translate(sequence, twelve)
     reduced_seq_fifteen = translate(sequence, fifteen)
     reduced_seq_eighteen = translate(sequence, eighteen)
-
     return reduced_seq_four, reduced_seq_eight, reduced_seq_ten, reduced_seq_twelve, reduced_seq_fifteen, reduced_seq_eighteen
 
-
-#calculate levenshetin distance using sliding window, returns min distance and corresponding window
+# Calculate Levenshtein distance using sliding window, returns min distance and corresponding window
 def sliding_window_levenshtein(str1, str2, window_size=None, step=2):
     if window_size is None:
         window_size = min(len(str1), len(str2))
-
     if len(str1) <= len(str2):
         target = str2
         query = str1
     else:
         target = str1
         query = str2
-
     distances = []
     for i in range(0, len(target) - window_size + 1, step):
         window = target[i:i + window_size]
         dist = Levenshtein.distance(query, window)
         distances.append((dist, window))
-
-    return sorted(distances)[0]
+    return sorted(distances)[0][0]  # Return only the minimum distance
 
 def process_entry(row):
     entry = row['Entry']
     sequence = row['Sequence']
-    
-    #reduce alphabet
+    # Reduce alphabet
     four_seq, eight_seq, ten_seq, twelve_seq, fifteen_seq, eighteen_seq = reduce_alphabet(sequence)
-    #calculate levenshtein distance against each alphabet
+    # Calculate Levenshtein distance against each alphabet
     four_dist = sliding_window_levenshtein(four_seq, target_seq_four)
     eight_dist = sliding_window_levenshtein(eight_seq, target_seq_eight)
     twelve_dist = sliding_window_levenshtein(twelve_seq, target_seq_twelve)
     eighteen_dist = sliding_window_levenshtein(eighteen_seq, target_seq_eighteen)
-
-    results = [entry, sequence, four_dist, eight_dist, twelve_dist, eighteen_dist]
-    return results
+    return (entry, sequence, four_dist, eight_dist, twelve_dist, eighteen_dist)
 
 # Load and filter uniprot
 IDRs = pd.read_csv(path_to_tsv, sep="\t")
 IDRs = IDRs[["Entry", "Sequence"]].drop_duplicates()
 
-#calculate reduced alphabet sequences of target sequence
+# Calculate reduced alphabet sequences of target sequence
 target_seq_four, target_seq_eight, target_seq_ten, target_seq_twelve, target_seq_fifteen, target_seq_eighteen = reduce_alphabet(target_sequence)
-
 
 # Remove already written entries
 if os.path.exists(output_filepath_csv) and os.path.getsize(output_filepath_csv) > 0:
@@ -161,8 +150,7 @@ num_workers = int(os.environ.get("SLURM_CPUS_PER_TASK", 1))
 with ProcessPoolExecutor(max_workers=num_workers) as executor, open(output_filepath_csv, "a") as f:
     futures = [executor.submit(process_entry, row) for row in rows]
     for future in as_completed(futures):
-        results = future.result()
-        for entry, sequence, four_dist, eight_dist, twelve_dist, eighteen_dist in results:
-            f.write(f"{entry}\t{sequence}\t{four_dist}\t{eight_dist}\t{twelve_dist}\t{eighteen_dist}\n")
+        entry, sequence, four_dist, eight_dist, twelve_dist, eighteen_dist = future.result()
+        f.write(f"{entry}\t{sequence}\t{four_dist}\t{eight_dist}\t{twelve_dist}\t{eighteen_dist}\n")
 
 print(f"Processed {len(rows)} entries and saved results to {output_filepath_csv}.")
