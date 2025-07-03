@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=alphafold_IDR_puller
 #SBATCH --account=co_moilab
-#SBATCH --partition=savio3_htc
+#SBATCH --partition=savio4_htc
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=5:00:00
