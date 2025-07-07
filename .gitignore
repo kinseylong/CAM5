@@ -12,6 +12,7 @@
 *.bam.bai
 *.samtools
 *.fastq
+*.fa
 *.fastq.gz
 
 *.conda/
